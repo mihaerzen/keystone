@@ -2,6 +2,19 @@ import React, { PropTypes } from 'react';
 import { Button } from '../../../admin/client/App/elemental';
 import ImageThumbnail from '../../components/ImageThumbnail';
 
+const labelWrapper = {
+	display: 'flex',
+	flexDirection: 'column',
+	margin: '8px 0',
+};
+
+const imageStyles = {
+	display: 'flex',
+	flexDirection: 'column',
+	width: '200px',
+	marginBottom: '30px',
+};
+
 function CloudinaryImagesThumbnail ({
 	isDeleted,
 	imageSourceLarge,
@@ -26,16 +39,15 @@ function CloudinaryImagesThumbnail ({
 		</Button>
 	) : null;
 
-	const input = (!isQueued && !isDeleted && value) ? (
-		<input type="hidden" name={inputName} value={JSON.stringify(value)} />
+	const labelInput = (!isQueued && !isDeleted && value) ? (
+		<div style={labelWrapper}>
+			<input type="text" name={`${inputName}-titles`} placeholder="Enter image title"/>
+		</div>
 	) : null;
 
-	// provide gutter for the images
-	const imageStyles = {
-		float: 'left',
-		marginBottom: 10,
-		marginRight: 10,
-	};
+	const input = (!isQueued && !isDeleted && value) ? (
+		<input type="hidden" name={inputName} value={JSON.stringify(value)}/>
+	) : null;
 
 	return (
 		<div style={imageStyles}>
@@ -46,8 +58,9 @@ function CloudinaryImagesThumbnail ({
 				mask={mask}
 				target={!!imageSourceLarge && '__blank'}
 			>
-				<img src={imageSourceSmall} style={{ height: 90 }} />
+				<img src={imageSourceSmall} style={{ maxWidth: '100%', maxHeight: '100%' }}/>
 			</ImageThumbnail>
+			{labelInput}
 			{actionButton}
 			{input}
 		</div>
