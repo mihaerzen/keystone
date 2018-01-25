@@ -19,11 +19,16 @@ import FileChangeMessage from '../../components/FileChangeMessage';
 const SUPPORTED_TYPES = ['image/*', 'application/pdf', 'application/postscript'];
 const SUPPORTED_REGEX = new RegExp(/^image\/|application\/pdf|application\/postscript/g);
 const RESIZE_DEFAULTS = {
-	crop: 'fit',
 	format: 'jpg',
 };
 
 let uploadInc = 1000;
+
+const thumbnailsStyle = {
+	display: 'flex',
+	flexWrap: 'wrap',
+	justifyContent: 'space-between',
+};
 
 module.exports = Field.create({
 	displayName: 'CloudinaryImagesField',
@@ -50,13 +55,14 @@ module.exports = Field.create({
 				value: img,
 				imageSourceSmall: cloudinaryResize(img.public_id, {
 					...RESIZE_DEFAULTS,
-					height: 90,
+					crop: 'fill',
+					height: 200,
+					width: 200,
 					secure: props.secure,
 				}),
 				imageSourceLarge: cloudinaryResize(img.public_id, {
 					...RESIZE_DEFAULTS,
 					height: 600,
-					width: 900,
 					secure: props.secure,
 				}),
 			}, index);
@@ -294,7 +300,7 @@ module.exports = Field.create({
 
 		return (
 			<FormField label={label} className="field-type-cloudinaryimages" htmlFor={path}>
-				<div>
+				<div style={thumbnailsStyle}>
 					{thumbnails}
 				</div>
 				{this.renderValueInput()}

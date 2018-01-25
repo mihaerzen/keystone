@@ -5,7 +5,7 @@ var FieldType = require('../Type');
 var keystone = require('../../../');
 var util = require('util');
 
-function getEmptyValue () {
+function getEmptyValue() {
 	return {
 		public_id: '',
 		version: 0,
@@ -19,7 +19,7 @@ function getEmptyValue () {
 	};
 }
 
-function truthy (value) {
+function truthy(value) {
 	return value;
 }
 
@@ -48,7 +48,7 @@ function cleanUp (oldValues, newValues) {
 /**
  * CloudinaryImages FieldType Constructor
  */
-function cloudinaryimages (list, path, options) {
+function cloudinaryimages(list, path, options) {
 	this._underscoreMethods = ['format'];
 	this._fixedSize = 'full';
 	this._properties = ['select', 'selectPrefix', 'autoCleanup', 'publicID', 'folder', 'filenameAsPublicID'];
@@ -62,6 +62,7 @@ function cloudinaryimages (list, path, options) {
 			+ 'See http://keystonejs.com/docs/configuration/#services-cloudinary for more information.\n');
 	}
 }
+
 cloudinaryimages.properName = 'CloudinaryImages';
 util.inherits(cloudinaryimages, FieldType);
 
@@ -110,6 +111,7 @@ cloudinaryimages.prototype.addToSchema = function (schema) {
 		width: Number,
 		height: Number,
 		secure_url: String,
+		title: String,
 	});
 
 	// Generate cloudinary folder used to upload/select images
@@ -198,7 +200,8 @@ cloudinaryimages.prototype.addToSchema = function (schema) {
 		var img = images[id];
 		if (!img) return;
 		if (method === 'delete') {
-			cloudinary.uploader.destroy(img.public_id, function () {});
+			cloudinary.uploader.destroy(img.public_id, function () {
+			});
 		}
 		images.splice(id, 1);
 		if (callback) {
@@ -273,6 +276,17 @@ cloudinaryimages.prototype.updateItem = function (item, data, files, callback) {
 	var values = this.getValueFromData(data);
 	var oldValues = item.get(this.path);
 
+	const titlesPath = `${field.path}-titles`;
+	const titles = _.get(data, titlesPath);
+
+	if (titles && titles.length) {
+		values = values.map((rawJson, index) => {
+			const val = JSON.parse(rawJson);
+			val.title = _.get(titles, index);
+			return JSON.stringify(val);
+		});
+	}
+
 	// TODO: This logic needs to block uploading of files from the data argument,
 	// see CloudinaryImage for a reference on how it should be implemented
 
@@ -295,7 +309,8 @@ cloudinaryimages.prototype.updateItem = function (item, data, files, callback) {
 
 	// We cache options to avoid recalculating them on each iteration in the map below
 	var cachedUploadOptions;
-	function getUploadOptions () {
+
+	function getUploadOptions() {
 		if (cachedUploadOptions) {
 			return cachedUploadOptions;
 		}
@@ -329,7 +344,8 @@ cloudinaryimages.prototype.updateItem = function (item, data, files, callback) {
 		) {
 			try {
 				return JSON.parse(value);
-			} catch (e) { /* value isn't JSON */ }
+			} catch (e) { /* value isn't JSON */
+			}
 		}
 		if (typeof value === 'string') {
 			// detect file upload (field value must be a reference to a field in the
