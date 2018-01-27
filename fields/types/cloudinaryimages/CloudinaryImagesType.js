@@ -111,7 +111,7 @@ cloudinaryimages.prototype.addToSchema = function (schema) {
 		width: Number,
 		height: Number,
 		secure_url: String,
-		title: String,
+		content: Object,
 	});
 
 	// Generate cloudinary folder used to upload/select images
@@ -276,16 +276,20 @@ cloudinaryimages.prototype.updateItem = function (item, data, files, callback) {
 	var values = this.getValueFromData(data);
 	var oldValues = item.get(this.path);
 
-	const titlesPath = `${field.path}-titles`;
-	const titles = _.get(data, titlesPath);
+	['en', 'de', 'it'].forEach(lang => {
+		const titlesPath = `${field.path}-titles-${lang}`;
+		const titles = _.get(data, titlesPath);
 
-	if (titles && titles.length) {
-		values = values.map((rawJson, index) => {
-			const val = JSON.parse(rawJson);
-			val.title = _.get(titles, index);
-			return JSON.stringify(val);
-		});
-	}
+		if (titles && titles.length) {
+			values = values.map((rawJson, index) => {
+				const val = JSON.parse(rawJson);
+
+				_.set(val, `content.${lang}.title`, _.get(titles, index));
+
+				return JSON.stringify(val);
+			});
+		}
+	});
 
 	// TODO: This logic needs to block uploading of files from the data argument,
 	// see CloudinaryImage for a reference on how it should be implemented
