@@ -258,12 +258,16 @@ cloudinaryimages.prototype.updateItem = function (item, data, files, callback) {
 		const titles = _.get(data, titlesPath);
 
 		if (titles && titles.length) {
-			values = values.map((rawJson, index) => {
-				const val = JSON.parse(rawJson);
+			values = values.map((rawValue, index) => {
+				try {
+					const val = JSON.parse(rawValue);
 
-				_.set(val, `content.${lang}.title`, _.get(titles, index));
+					_.set(val, `content.${lang}.title`, _.get(titles, index, ''));
 
-				return JSON.stringify(val);
+					return JSON.stringify(val);
+				} catch (e) {
+					return rawValue;
+				}
 			});
 		}
 	});
